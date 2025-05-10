@@ -9,7 +9,9 @@
 
 ## Demo
 
-[Watch Demo Video](https://www.canva.com/design/DAGnEk7eOaY/EkgBMZjM8fTSfMLbjfrlfA/watch?utm_content=DAGnEk7eOaY&utm_campaign=share_your_design&utm_medium=link2&utm_source=shareyourdesignpanel)
+**Online Demo**: [Watch on Canva](https://www.canva.com/design/DAGnEk7eOaY/EkgBMZjM8fTSfMLbjfrlfA/watch?utm_content=DAGnEk7eOaY&utm_campaign=share_your_design&utm_medium=link2&utm_source=shareyourdesignpanel)
+
+**Local Demo**: [Download demo.mp4](images/demo.mp4) _(Note: Requires Git LFS to download)_
 
 ![Financial Advisor Dashboard](images/HRwithMCP.png)
 
