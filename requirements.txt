@@ -1,0 +1,6 @@
+mcp[cli]
+openai
+langchain
+langchain_community
+streamlit
+pandas
