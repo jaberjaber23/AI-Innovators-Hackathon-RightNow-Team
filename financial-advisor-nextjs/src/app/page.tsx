@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   FaTrash, FaPaperPlane, FaBars, FaTimes, FaChartLine, 
-  FaHistory, FaDownload, FaFilePdf, FaFileAlt, FaFileExport
+  FaHistory, FaDownload, FaFilePdf, FaFileAlt, FaFileExport, FaWhatsapp
 } from 'react-icons/fa';
 import { 
   BiChat, BiLineChart, BiSearchAlt, BiSpreadsheet, 
@@ -18,6 +18,7 @@ import ChatBubble from '@/components/ChatBubble';
 import TypingIndicator from '@/components/TypingIndicator';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import Link from 'next/link';
 
 // Define message type
 type Message = {
@@ -461,6 +462,20 @@ export default function Home() {
           </div>
           
           <div className="px-6 mb-6">
+            {/* WhatsApp integration */}
+            <div className="mb-6">
+              <h2 className="text-primary-200 font-semibold mb-3 text-xs uppercase tracking-wide flex items-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary-300 mr-2"></div>
+                Integrations
+              </h2>
+              <Link href="/whatsapp" className="p-2.5 bg-green-600 hover:bg-green-700 rounded-xl flex items-center text-sm text-white transition-colors border border-green-500">
+                <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center mr-3">
+                  <FaWhatsapp />
+                </div>
+                WhatsApp Integration
+              </Link>
+            </div>
+            
             {/* Actions */}
             <div className="space-y-2">
               <button

@@ -35,6 +35,13 @@ echo Waiting for Next.js Bridge to initialize...
 timeout /t 5 /nobreak >nul
 
 echo.
+echo Starting WhatsApp Integration server (in a new window)...
+start cmd /k "python whatsapp_integration.py"
+
+echo Waiting for WhatsApp Integration to initialize...
+timeout /t 5 /nobreak >nul
+
+echo.
 echo Starting Next.js Frontend...
 cd financial-advisor-nextjs
 echo.
@@ -44,10 +51,11 @@ echo.
 echo The application will be available at:
 echo http://localhost:3000
 echo.
-echo Make sure all three components are running:
+echo Make sure all four components are running:
 echo 1. MCP Server (port 8000)
 echo 2. Next.js Bridge (port 8001)
-echo 3. Next.js Frontend (port 3000)
+echo 3. WhatsApp Integration (port 8002)
+echo 4. Next.js Frontend (port 3000)
 echo ===================================
 echo.
 npm run dev

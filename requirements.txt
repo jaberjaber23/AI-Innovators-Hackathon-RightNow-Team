@@ -4,3 +4,7 @@ langchain
 langchain_community
 streamlit
 pandas
+twilio
+fastapi
+uvicorn
+python-dotenv
