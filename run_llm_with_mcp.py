@@ -9,12 +9,15 @@ import json
 import streamlit as st
 import anyio
 import sys
+from datetime import datetime
+import base64
+import time
 
 # Load .env
 load_dotenv()
 
 client = OpenAI()
-model = os.environ.get("MODEL", "gpt-4")
+model = os.environ.get("MODEL", "gpt-4.1-nano")
 
 class ConnectionManager:
     def __init__(self, sse_server_map):
@@ -125,63 +128,248 @@ async def chat(input_messages, tool_map, tools, max_turns=3, connection_manager=
     print("\n Final Assistant Response:")
     return str(result.choices[0].message.content)
 
-st.set_page_config(layout="wide", page_title="Chat Application")
-col1, col2 = st.columns(2)
-with col1:
-    st.image(os.path.join(os.getcwd(), "images/adv.png"), width=300)
+# Helper function for background images
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+    return f"""
+    <style>
+    .stApp {{
+        background-image: url(data:image/png;base64,{encoded_string});
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }}
+    </style>
+    """
 
-with col2:
-    st.title("""
-    :blue[Smart Financial Advisor]
-            Jordan Retail Transactions Analyzer
-            How can I help you today?
-    """)
+# Function to get time-based greeting
+def get_greeting():
+    hour = datetime.now().hour
+    if 5 <= hour < 12:
+        return "Good morning"
+    elif 12 <= hour < 18:
+        return "Good afternoon"
+    else:
+        return "Good evening"
 
+# Set page configuration
+st.set_page_config(
+    layout="wide", 
+    page_title="Smart Financial Advisor", 
+    page_icon="📊",
+    initial_sidebar_state="expanded"
+)
+
+# Apply custom CSS
 st.markdown(
     """
     <style>
-        /* Change sidebar background color */
-        [data-testid="stSidebar"] {
-            background-color: #00294F !important; /* Deep blue */
+        /* Main application styling */
+        .stApp {
+            background-color: #f5f7ff;
         }
-
-        /* Change all text color inside the sidebar */
+        
+        /* Chat container styling */
+        .chat-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 100, 0.1);
+            margin: 10px 0;
+        }
+        
+        /* Sidebar styling */
+        [data-testid="stSidebar"] {
+            background-color: #00294F !important;
+            background-image: linear-gradient(180deg, #00294F 0%, #004080 100%);
+        }
+        
         [data-testid="stSidebar"] * {
             color: white !important;
         }
-
-        /* Specifically change sidebar title and subheader color */
-        [data-testid="stSidebar"] h1, 
-        [data-testid="stSidebar"] h2 {
-            color: white !important;
+        
+        /* Header styling */
+        h1, h2, h3 {
+            font-family: 'Arial', sans-serif;
+            color: #003366;
         }
-
-        /* Change all buttons background color */
+        
+        /* Logo container styling */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Chat message styling */
+        [data-testid="stChatMessage"] {
+            border-radius: 15px !important;
+            margin: 10px 0 !important;
+            padding: 10px 15px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+        }
+        
+        /* User message styling */
+        [data-testid="stChatMessage"][data-testid="user"] {
+            background-color: #e6f3ff !important;
+        }
+        
+        /* Assistant message styling */
+        [data-testid="stChatMessage"][data-testid="assistant"] {
+            background-color: #f0f7ff !important;
+        }
+        
+        /* Input box styling */
+        [data-testid="stChatInput"] {
+            border-radius: 30px !important;
+            padding: 10px 20px !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid #0063B2 !important;
+        }
+        
+        /* Button styling */
         [data-testid="stButton"] button {
-            background-color: #0063B2 !important; /* Blue background */
-            color: white !important; /* White text */
-            border-radius: 10px !important; /* Rounded corners */
-            padding: 10px 20px !important; /* Adjust padding */
-            font-size: 16px !important; /* Adjust font size */
+            background-color: #0063B2 !important;
+            color: white !important;
+            border-radius: 10px !important;
+            padding: 10px 20px !important;
+            font-size: 16px !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
         }
-
-        [data-testid="stButton"] button p {
-            color: white !important;  /* Ensure text inside button is white */
+        
+        [data-testid="stButton"] button:hover {
+            background-color: #004a8c !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        /* Status indicators */
+        .status-connected {
+            color: #4CAF50 !important;
+            font-weight: bold;
+        }
+        
+        .status-disconnected {
+            color: #F44336 !important;
+            font-weight: bold;
+        }
+        
+        /* Warning messages */
+        .stAlert {
+            border-radius: 10px !important;
+            margin: 15px 0 !important;
+        }
+        
+        /* Progress/spinner */
+        .stSpinner {
+            border-color: #0063B2 !important;
+        }
+        
+        /* Feature list styling */
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .feature-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        /* Footer styling */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 41, 79, 0.9);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
         }
     </style>
     """,
     unsafe_allow_html=True
 )
 
+# Sidebar content
 with st.sidebar:
+    st.image(os.path.join(os.getcwd(), "images/adv.png"), width=200)
     st.title("📊 Smart Financial Advisor")
-    st.subheader("Features:")
-    st.write("- 📈 Retail Transaction Analysis from Jordan Malls")
-    st.write("- 💬 Natural Language Financial Queries")
-    st.write("- 🔍 Transaction Pattern Detection")
-    st.write("- 📋 Report Generation Through Conversation")
-    st.write("- 📧 Email Report Capabilities")
-    st.write("- 📊 Data-Driven Financial Insights")
+    
+    # Connection status indicator
+    if "is_connected" in st.session_state:
+        if st.session_state.is_connected:
+            st.markdown("<p class='status-connected'>● Connected to MCP Server</p>", unsafe_allow_html=True)
+        else:
+            st.markdown("<p class='status-disconnected'>● Disconnected</p>", unsafe_allow_html=True)
+    
+    st.divider()
+    
+    st.subheader("💼 Features")
+    features = [
+        ("📈", "Retail Transaction Analysis"),
+        ("💬", "Natural Language Financial Queries"),
+        ("🔍", "Transaction Pattern Detection"),
+        ("📋", "Report Generation"),
+        ("📧", "Email Report Capabilities"),
+        ("📊", "Data-Driven Financial Insights")
+    ]
+    
+    for icon, feature in features:
+        st.markdown(f"""
+        <div class='feature-item'>
+            <span style='font-size: 20px; margin-right: 10px;'>{icon}</span>
+            <span>{feature}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.divider()
+    
+    # Clear chat button
+    if st.button("🗑️ Clear Conversation"):
+        st.session_state.messages = []
+        st.experimental_rerun()
+    
+    # Model information
+    st.subheader("ℹ️ Model Information")
+    st.info(f"Using: {model}")
+    
+    # Add custom footer
+    st.markdown(
+        """
+        <div class='footer'>
+            © 2023 Smart Financial Advisor - Jordan Retail Analysis
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Main content area
+st.markdown(
+    f"""
+    <div class='logo-container'>
+        <div style='margin-left: 20px;'>
+            <h1 style='color: #0063B2; margin-bottom: 0;'>Smart Financial Advisor</h1>
+            <p style='color: #666; margin-top: 0;'>Jordan Retail Transactions Analyzer</p>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # Main entry
 if __name__ == "__main__":
@@ -190,23 +378,32 @@ if __name__ == "__main__":
     }
 
     async def main():
+        # Initialize session state
         st.session_state.setdefault("messages", [])
-        
-        # Display warning if server not running
-        st.warning("**Important**: Make sure the MCP server is running with `python mcp_server.py` before asking questions.", icon="⚠️")
         
         connection_manager = ConnectionManager(sse_server_map)
         
         try:
-            await connection_manager.initialize()
+            # Add a progress bar for connection
+            with st.status("Connecting to MCP server...") as status:
+                await connection_manager.initialize()
+                
+                if connection_manager.is_connected:
+                    status.update(label="✅ Connected to MCP server!", state="complete")
+                    time.sleep(1)  # Give user time to see the success message
+                else:
+                    status.update(label="❌ Failed to connect to MCP server", state="error")
+            
+            # Store connection status in session state
+            st.session_state.is_connected = connection_manager.is_connected
             
             if not connection_manager.is_connected:
                 st.error("Failed to connect to MCP server. Please make sure it's running with `python mcp_server.py`")
                 for message in st.session_state.messages:
                     with st.chat_message(message["role"]):
-                        st.write(message["content"])
+                        st.markdown(message["content"])
                 
-                question = st.chat_input(disabled=not connection_manager.is_connected)
+                question = st.chat_input("Type your question here...", disabled=not connection_manager.is_connected)
                 if question:
                     st.session_state.messages.append({"role": "user", "content": question})
                     st.experimental_rerun()
@@ -230,21 +427,51 @@ if __name__ == "__main__":
                 for tool in tool_objects
             ]
             
-            # Display chat history
-            for message in st.session_state.messages:
-                with st.chat_message(message["role"]):
-                    st.write(message["content"])
+            # Display chat container
+            chat_container = st.container()
+            with chat_container:
+                # Welcome message if no messages yet
+                if not st.session_state.messages:
+                    st.markdown(f"""
+                    <div style='text-align: center; padding: 40px; background-color: #f9f9f9; border-radius: 15px; margin: 20px 0;'>
+                        <h2>{get_greeting()}, I'm your Financial Advisor Assistant!</h2>
+                        <p style='font-size: 18px;'>Ask me about retail transaction data from Jordan malls. I can help with:</p>
+                        <div style='display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px;'>
+                            <div style='background-color: white; padding: 15px; border-radius: 10px; width: 200px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                                <p style='font-weight: bold; color: #0063B2;'>Sales Analysis</p>
+                                <p style='font-size: 14px;'>Track performance trends across different periods</p>
+                            </div>
+                            <div style='background-color: white; padding: 15px; border-radius: 10px; width: 200px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                                <p style='font-weight: bold; color: #0063B2;'>Customer Insights</p>
+                                <p style='font-size: 14px;'>Understand customer behavior and preferences</p>
+                            </div>
+                            <div style='background-color: white; padding: 15px; border-radius: 10px; width: 200px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                                <p style='font-weight: bold; color: #0063B2;'>Business Recommendations</p>
+                                <p style='font-size: 14px;'>Get actionable insights to grow your business</p>
+                            </div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Display chat history
+                for message in st.session_state.messages:
+                    icon = "🧑‍💼" if message["role"] == "user" else "🤖"
+                    with st.chat_message(message["role"], avatar=icon):
+                        st.markdown(message["content"])
             
             # Chat input
-            question = st.chat_input()
+            question = st.chat_input("Ask about your retail transaction data...", key="chat_input")
             if question:
                 # Add user message to chat history
                 st.session_state.messages.append({"role": "user", "content": question})
-                with st.chat_message("user"):
-                    st.write(question)
+                with st.chat_message("user", avatar="🧑‍💼"):
+                    st.markdown(question)
 
-                with st.chat_message("assistant"):
-                    with st.spinner("Thinking..."):
+                with st.chat_message("assistant", avatar="🤖"):
+                    message_placeholder = st.empty()
+                    message_placeholder.markdown("Analyzing your data...")
+                    
+                    with st.spinner("Processing your request..."):
                         input_messages = [
                             {"role": "system", "content": "You are a Smart Financial Advisor specialized in analyzing retail transaction data from Jordan malls. You can analyze sales performance, identify patterns, and generate insights from transaction data. You should respond with specific data and insights, and suggest actionable business recommendations when appropriate."},
                             {"role": "user", "content": question},
@@ -256,8 +483,9 @@ if __name__ == "__main__":
                             tools=tools_json,
                             connection_manager=connection_manager,
                         )
-                
-                        st.write(response)
+                    
+                        # Replace placeholder with actual response
+                        message_placeholder.markdown(response)
                         # Add assistant response to chat history
                         st.session_state.messages.append({"role": "assistant", "content": response})
         

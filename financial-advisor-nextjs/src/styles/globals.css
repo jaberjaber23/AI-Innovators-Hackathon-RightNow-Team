@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-secondary-50 text-gray-800 min-h-screen;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading text-primary-900;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-button;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-500 text-white hover:bg-primary-600 hover:shadow-button-hover hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-100 text-primary-700 hover:bg-secondary-200 hover:shadow-button-hover hover:-translate-y-0.5;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-card p-6;
+  }
+  
+  .sidebar {
+    @apply bg-gradient-to-b from-primary-900 to-primary-700 text-white h-screen sticky top-0 overflow-y-auto;
+  }
+  
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-300 shadow-input focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+  
+  .chat-message {
+    @apply p-4 rounded-xl max-w-[80%] mb-4 shadow-sm;
+  }
+  
+  .user-message {
+    @apply bg-primary-100 text-gray-800 ml-auto;
+  }
+  
+  .assistant-message {
+    @apply bg-white text-gray-800 mr-auto;
+  }
+  
+  .typing-indicator {
+    @apply flex space-x-1 items-center py-2;
+  }
+  
+  .typing-indicator-dot {
+    @apply w-2 h-2 rounded-full bg-primary-500 opacity-75;
+  }
+  
+  .feature-item {
+    @apply flex items-center p-3 rounded-lg hover:bg-white/10 transition-all duration-200 cursor-pointer;
+  }
+  
+  .status-indicator {
+    @apply inline-block w-2 h-2 rounded-full mr-2;
+  }
+  
+  .status-connected {
+    @apply bg-green-500;
+  }
+  
+  .status-disconnected {
+    @apply bg-red-500;
+  }
+} 

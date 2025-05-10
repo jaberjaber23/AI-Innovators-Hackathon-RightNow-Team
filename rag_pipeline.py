@@ -11,7 +11,7 @@ load_dotenv()
 
 # Initialize components
 embeddings = OpenAIEmbeddings()
-model = ChatOpenAI(model="gpt-4")
+model = ChatOpenAI(model="gpt-4.1-nano")
 
 # Load the transactions data
 csv_path = os.path.join(os.getcwd(), "pdfs", "jordan_transactions.csv")

@@ -23,7 +23,7 @@ This project implements a Retrieval-Augmented Generation (RAG) chatbot using Str
   When a user submits a query, the chatbot performs a similarity search to retrieve the most relevant document chunks based on the query.
 
 - **Prompt-Based Answer Generation**:  
-  A custom prompt template combines the user question with retrieved context, and a GPT-4 powered LLM (using `ChatOpenAI`) generates the final answer.
+  A custom prompt template combines the user question with retrieved context, and a gpt-4.1-nano.1-nano powered LLM (using `ChatOpenAI`) generates the final answer.
 
 - **Interactive Interface**:  
   The application uses Streamlit to provide an interactive, chat-like interface where user questions and bot responses are displayed.
