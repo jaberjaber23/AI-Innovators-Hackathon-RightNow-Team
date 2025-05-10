@@ -157,6 +157,16 @@ Our frontend offers:
 - **Export Capabilities**: Generate PDFs and JSON exports of financial insights
 - **Responsive Design**: Optimized for desktop and mobile usage
 
+## Frontend Landing Page Design
+
+Below are screenshots of our planned landing page design that wasn't deployed due to time constraints:
+
+| | |
+|---|---|
+| ![Landing Page - Hero Section](images/frontend/1.jpg) | ![Landing Page - Features](images/frontend/2.jpg) |
+| ![Landing Page - Dashboard Preview](images/frontend/3.jpg) | ![Landing Page - WhatsApp Integration](images/frontend/4.jpg) |
+| ![Landing Page - Client Testimonials](images/frontend/5.jpg) | ![Landing Page - Contact Section](images/frontend/6.jpg) |
+
 ### 5. WhatsApp Integration (`whatsapp_integration.py`)
 
 Connect to the system via WhatsApp:
